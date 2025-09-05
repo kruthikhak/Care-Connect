@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            min-height: 100vh;
+            padding-top: 2rem;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            width: calc(100% - 250px);
+            position: relative;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .symptom-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .symptom-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .urgency-high {
+            color: #dc3545;
+        }
+
+        .urgency-medium {
+            color: #ffc107;
+        }
+
+        .urgency-low {
+            color: #28a745;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .form-check {
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .form-check:hover {
+            background-color: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="d-flex flex-column">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+                        <span class="fs-4 ms-2 text-white">Care Connect</span>
+                    </a>
+                    <hr class="text-white">
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="/symptom-checker" class="nav-link active">
+                                <i class="fas fa-clipboard-check"></i>
+                                Symptom Checker
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/appointments" class="nav-link">
+                                <i class="fas fa-calendar-alt"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/profile" class="nav-link">
+                                <i class="fas fa-user"></i>
+                                Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <div class="symptom-card">
+                    <h2 class="mb-4">Symptom Checker</h2>
+                    <form id="symptomForm">
+                        <div class="mb-4">
+                            <label class="form-label">Select Your Symptoms</label>
+                            <div class="symptom-list" id="symptomList">
+                                <!-- Symptoms will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">How long have you been experiencing these symptoms?</label>
+                            <select class="form-select" id="duration" required>
+                                <option value="">Select duration</option>
+                                <option value="1">Less than 24 hours</option>
+                                <option value="2">1-3 days</option>
+                                <option value="3">3-7 days</option>
+                                <option value="4">More than a week</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Check Symptoms
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsCard" class="result-card">
+                    <h3 class="mb-4">Assessment Results</h3>
+                    <div class="mb-4">
+                        <h5>Urgency Level:</h5>
+                        <p id="urgencyLevel" class="fs-4 fw-bold"></p>
+                    </div>
+                    <div class="mb-4">
+                        <h5>Recommendations:</h5>
+                        <ul id="recommendations" class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                    <div class="mb-4">
+                        <h5>Recommended Specialists:</h5>
+                        <ul id="specialists" class="list-group list-group-flush">
+                        </ul>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='/appointments'">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Load symptoms when page loads
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/symptoms');
+                const symptoms = await response.json();
+                
+                const symptomList = document.getElementById('symptomList');
+                symptoms.forEach(symptom => {
+                    const div = document.createElement('div');
+                    div.className = 'form-check mb-2';
+                    div.innerHTML = `
+                        <input class="form-check-input" type="checkbox" value="${symptom.id}" id="symptom${symptom.id}">
+                        <label class="form-check-label" for="symptom${symptom.id}">
+                            ${symptom.name}
+                        </label>
+                    `;
+                    symptomList.appendChild(div);
+                });
+            } catch (error) {
+                showToast('Failed to load symptoms', 'danger');
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('symptomForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const selectedSymptoms = Array.from(document.querySelectorAll('.form-check-input:checked'))
+                .map(checkbox => parseInt(checkbox.value));
+            
+            const duration = parseInt(document.getElementById('duration').value);
+
+            if (selectedSymptoms.length === 0) {
+                showToast('Please select at least one symptom', 'danger');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/symptom-check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        symptoms: selectedSymptoms,
+                        duration: duration
+                    })
+                });
+
+                const data = await response.json();
+                
+                // Display results
+                document.getElementById('resultsCard').style.display = 'block';
+                
+                const urgencyLevel = document.getElementById('urgencyLevel');
+                urgencyLevel.textContent = data.urgency.toUpperCase();
+                urgencyLevel.className = `fs-4 fw-bold urgency-${data.urgency}`;
+
+                const recommendationsList = document.getElementById('recommendations');
+                recommendationsList.innerHTML = data.recommendations
+                    .map(rec => `<li class="list-group-item">${rec}</li>`)
+                    .join('');
+
+                const specialistsList = document.getElementById('specialists');
+                specialistsList.innerHTML = data.specialists
+                    .map(spec => `<li class="list-group-item">${spec}</li>`)
+                    .join('');
+
+                // Scroll to results
+                document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                showToast('Failed to process symptoms', 'danger');
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                showToast('Logout failed', 'danger');
+            }
+        });
+    </script>
+</body>
+</html> 

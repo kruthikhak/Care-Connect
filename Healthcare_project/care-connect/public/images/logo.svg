@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60" viewBox="0 0 200 60">
+  <style>
+    .text { font: bold 24px sans-serif; fill: #4361ee; }
+    .icon { fill: #4361ee; }
+  </style>
+  <g>
+    <path class="icon" d="M30,10 h20 v10 h10 v20 h-10 v10 h-20 v-10 h-10 v-20 h10 z"/>
+    <text class="text" x="70" y="35">Care Connect</text>
+  </g>
+</svg> 

@@ -1,0 +1,39 @@
+{% extends "rest_framework/base.html" %}
+
+{% block title %}
+Healthcare API
+{% endblock %}
+
+{% block branding %}
+<a class='navbar-brand' rel="nofollow" href='/api/'>
+    Healthcare API
+</a>
+{% endblock %}
+
+{% block style %}
+{{ block.super }}
+<style>
+    .navbar-inverse {
+        background-color: #2c3e50;
+        border-color: #2c3e50;
+    }
+    .navbar-inverse .navbar-brand {
+        color: #ecf0f1;
+    }
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #2980b9;
+    }
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2573a7;
+    }
+    pre {
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+    .filter-wrapper {
+        margin-bottom: 2em;
+    }
+</style>
+{% endblock %} 

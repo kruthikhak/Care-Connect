@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 1.1rem;
+        }
+
+        .back-link:hover {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-header {
+            margin-bottom: 2rem;
+        }
+
+        .login-form input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .login-form input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .login-form input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            box-shadow: none;
+        }
+
+        .btn-google {
+            background: white;
+            color: #4361ee;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-google:hover {
+            transform: translateY(-2px);
+            background: #f8f9fa;
+        }
+
+        .btn-login {
+            background: white;
+            color: #4361ee;
+            border: none;
+            font-weight: 600;
+            padding: 0.8rem;
+            width: 100%;
+            margin-top: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            background: #f8f9fa;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1rem 0;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 1rem 0;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .demo-credentials {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">
+        <i class="bi bi-arrow-left"></i>
+        Back to Home
+    </a>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>Welcome Back</h1>
+                <p>Sign in to continue to Care Connect</p>
+            </div>
+
+            <button class="btn btn-google w-100">
+                <i class="bi bi-google"></i>
+                Continue with Google
+            </button>
+
+            <div class="divider">
+                <span>Or sign in with email</span>
+            </div>
+
+            <form class="login-form" id="loginForm">
+                <input type="email" class="form-control" placeholder="Email" required>
+                <input type="password" class="form-control" placeholder="Password" required>
+                
+                <div class="remember-me">
+                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-login">Sign In</button>
+            </form>
+
+            <div class="demo-credentials">
+                Demo credentials:<br>
+                demo@example.com / password123
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = e.target.querySelector('input[type="email"]').value;
+            const password = e.target.querySelector('input[type="password"]').value;
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Login successful! Redirecting...');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showToast(data.message || 'Login failed', 'danger');
+                }
+            } catch (error) {
+                showToast('An error occurred during login', 'danger');
+            }
+        });
+
+        // Handle Google login button
+        document.querySelector('.btn-google').addEventListener('click', () => {
+            showToast('Google login is not implemented in the demo', 'warning');
+        });
+    </script>
+</body>
+</html> 

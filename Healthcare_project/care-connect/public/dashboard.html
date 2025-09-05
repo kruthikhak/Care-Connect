@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            padding: 2rem;
+            position: relative;
+        }
+
+        /* Animated Background Elements */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .floating-icon {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .floating-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .floating-icon:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .floating-icon:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 2s; }
+        .floating-icon:nth-child(4) { top: 40%; right: 15%; animation-delay: 3s; }
+        .floating-icon:nth-child(5) { bottom: 20%; right: 5%; animation-delay: 4s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .dashboard-card:nth-child(1) { animation-delay: 0.2s; }
+        .dashboard-card:nth-child(2) { animation-delay: 0.4s; }
+        .dashboard-card:nth-child(3) { animation-delay: 0.6s; }
+        .dashboard-card:nth-child(4) { animation-delay: 0.8s; }
+
+        /* Stats Animation */
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .stat-number:nth-child(1) { animation-delay: 1s; }
+        .stat-number:nth-child(2) { animation-delay: 1.2s; }
+        .stat-number:nth-child(3) { animation-delay: 1.4s; }
+
+        /* Search Bar Animation */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards 1.6s;
+        }
+
+        .search-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem;
+            border-radius: 30px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Navigation */
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Button Animations */
+        .btn-action {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
+        <i class="bi bi-heart-pulse floating-icon"></i>
+        <i class="bi bi-clipboard2-pulse floating-icon"></i>
+        <i class="bi bi-hospital floating-icon"></i>
+        <i class="bi bi-activity floating-icon"></i>
+        <i class="bi bi-heart floating-icon"></i>
+    </div>
+
+    <div class="dashboard-container">
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <a class="navbar-brand text-white" href="#">
+                    <i class="bi bi-hospital me-2"></i>Care Connect
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Settings</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="search-container">
+            <input type="text" class="search-input" placeholder="Search hospitals, doctors, or services...">
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <i class="bi bi-hospital text-white mb-3" style="font-size: 2rem;"></i>
+                    <h3>Nearby Hospitals</h3>
+                    <div class="stat-number">12</div>
+                    <p>Within 5km radius</p>
+                    <button class="btn btn-action w-100" onclick="window.location.href='/search.html?type=hospitals'">View All</button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <i class="bi bi-person-badge text-white mb-3" style="font-size: 2rem;"></i>
+                    <h3>Available Doctors</h3>
+                    <div class="stat-number">45</div>
+                    <p>Online now</p>
+                    <button class="btn btn-action w-100" onclick="window.location.href='/search.html?type=doctors'">Find Doctor</button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <i class="bi bi-calendar-check text-white mb-3" style="font-size: 2rem;"></i>
+                    <h3>Appointments</h3>
+                    <div class="stat-number">3</div>
+                    <p>Upcoming</p>
+                    <button class="btn btn-action w-100" onclick="window.location.href='/booking.html'">Schedule</button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="dashboard-card">
+                    <i class="bi bi-heart-pulse text-white mb-3" style="font-size: 2rem;"></i>
+                    <h3>Health Records</h3>
+                    <div class="stat-number">8</div>
+                    <p>Last 30 days</p>
+                    <button class="btn btn-action w-100" onclick="window.location.href='/profile.html#medical-history'">View Records</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <div class="dashboard-card">
+                    <h3>Recent Activity</h3>
+                    <div class="list-group">
+                        <a href="/booking.html" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Appointment Scheduled</h5>
+                                <small>3 days ago</small>
+                            </div>
+                            <p class="mb-1">Dr. Smith - General Checkup</p>
+                        </a>
+                        <a href="/profile.html#medical-history" class="list-group-item list-group-item-action bg-transparent text-white border-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Prescription Updated</h5>
+                                <small>1 week ago</small>
+                            </div>
+                            <p class="mb-1">Dr. Johnson - Follow-up</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="dashboard-card">
+                    <h3>Quick Actions</h3>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-action" onclick="window.location.href='/booking.html'">Book Appointment</button>
+                        <button class="btn btn-action" onclick="window.location.href='/profile.html#prescriptions'">View Prescriptions</button>
+                        <button class="btn btn-action" onclick="window.location.href='/support.html'">Contact Support</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .quick-action {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quick-action:hover {
+            color: #4361ee;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h4 class="text-center mb-4">Care Connect</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="/dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/symptom-checker">
+                        <i class="bi bi-clipboard2-pulse"></i> Symptom Checker
+                    </a>
+                    <a class="nav-link" href="/appointments">
+                        <i class="bi bi-calendar-check"></i> Appointments
+                    </a>
+                    <a class="nav-link" href="/suggestions">
+                        <i class="bi bi-lightbulb"></i> Suggestions
+                    </a>
+                    <a class="nav-link" href="/facilities">
+                        <i class="bi bi-hospital"></i> Find Facilities
+                    </a>
+                    <a class="nav-link" href="/profile">
+                        <i class="bi bi-person"></i> Profile
+                    </a>
+                    <a class="nav-link" href="#" id="logoutBtn">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Welcome Section -->
+                <div class="dashboard-card stats-card mb-4">
+                    <h2 class="mb-3">Welcome back, <span id="userName">User</span>!</h2>
+                    <p class="mb-0">Here's your health overview and quick actions.</p>
+                </div>
+
+                <div class="row">
+                    <!-- Quick Actions -->
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="mb-3">Quick Actions</h4>
+                            <div class="list-group">
+                                <a href="/symptom-checker" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-clipboard2-pulse text-primary"></i> Check Your Symptoms
+                                </a>
+                                <a href="/appointments" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-calendar-plus text-primary"></i> Book an Appointment
+                                </a>
+                                <a href="/facilities" class="list-group-item list-group-item-action">
+                                    <i class="bi bi-hospital text-primary"></i> Find Healthcare Facilities
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming Appointments -->
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="mb-3">Upcoming Appointments</h4>
+                            <div id="appointmentsList">
+                                <!-- Appointments will be loaded here -->
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-calendar3 fs-1"></i>
+                                    <p>Loading appointments...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Health Suggestions -->
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="mb-3">Health Tips</h4>
+                            <div id="healthTipsList">
+                                <!-- Health tips will be loaded here -->
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-lightbulb fs-1"></i>
+                                    <p>Loading health tips...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Health Stats -->
+                    <div class="col-md-6 mb-4">
+                        <div class="dashboard-card">
+                            <h4 class="mb-3">Health Profile</h4>
+                            <div id="healthProfile">
+                                <!-- Health profile will be loaded here -->
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-person-lines-fill fs-1"></i>
+                                    <p>Loading profile...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/auth/status');
+                const data = await response.json();
+                if (!data.authenticated) {
+                    window.location.href = '/login';
+                } else {
+                    document.getElementById('userName').textContent = data.user.name;
+                }
+            } catch (error) {
+                showToast('Authentication check failed', 'danger');
+            }
+        }
+
+        // Load appointments
+        async function loadAppointments() {
+            try {
+                const response = await fetch('/api/appointments');
+                const data = await response.json();
+                
+                const appointmentsList = document.getElementById('appointmentsList');
+                if (data.appointments && data.appointments.length > 0) {
+                    const upcomingAppointments = data.appointments
+                        .filter(apt => apt.status === 'upcoming')
+                        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                    appointmentsList.innerHTML = upcomingAppointments
+                        .slice(0, 3)
+                        .map(apt => `
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">${apt.type}</h6>
+                                        <p class="mb-0 text-muted">
+                                            <i class="bi bi-calendar"></i> ${apt.date}
+                                            <i class="bi bi-clock ms-2"></i> ${apt.time}
+                                        </p>
+                                        <small class="text-muted">with ${apt.doctor}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('') + `
+                        <a href="/appointments" class="btn btn-outline-primary btn-sm">View All Appointments</a>
+                    `;
+                } else {
+                    appointmentsList.innerHTML = `
+                        <div class="text-center text-muted">
+                            <p>No upcoming appointments</p>
+                            <a href="/appointments" class="btn btn-primary btn-sm">Schedule Now</a>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                showToast('Failed to load appointments', 'danger');
+            }
+        }
+
+        // Load health tips
+        async function loadHealthTips() {
+            try {
+                const response = await fetch('/api/suggestions');
+                const data = await response.json();
+                
+                const healthTipsList = document.getElementById('healthTipsList');
+                if (data.healthTips && data.healthTips.length > 0) {
+                    healthTipsList.innerHTML = data.healthTips
+                        .slice(0, 2)
+                        .map(tip => `
+                            <div class="mb-3">
+                                <h6 class="mb-2">
+                                    <i class="bi ${tip.icon} text-primary"></i>
+                                    ${tip.title}
+                                </h6>
+                                <p class="mb-0 small">${tip.description}</p>
+                            </div>
+                        `).join('') + `
+                        <a href="/suggestions" class="btn btn-outline-primary btn-sm">View All Tips</a>
+                    `;
+                }
+            } catch (error) {
+                showToast('Failed to load health tips', 'danger');
+            }
+        }
+
+        // Load health profile
+        async function loadHealthProfile() {
+            try {
+                const response = await fetch('/api/profile');
+                const data = await response.json();
+                
+                if (data.success && data.profile) {
+                    const profile = data.profile;
+                    document.getElementById('healthProfile').innerHTML = `
+                        <div class="mb-3">
+                            <p class="mb-2"><strong>Name:</strong> ${profile.fullName}</p>
+                            <p class="mb-2"><strong>Age:</strong> ${calculateAge(profile.dateOfBirth)} years</p>
+                            <p class="mb-2"><strong>Allergies:</strong> ${profile.medicalHistory.allergies.join(', ')}</p>
+                            <p class="mb-2"><strong>Conditions:</strong> ${profile.medicalHistory.chronicConditions.join(', ')}</p>
+                        </div>
+                        <a href="/profile" class="btn btn-outline-primary btn-sm">View Full Profile</a>
+                    `;
+                }
+            } catch (error) {
+                showToast('Failed to load health profile', 'danger');
+            }
+        }
+
+        function calculateAge(birthDate) {
+            const birth = new Date(birthDate);
+            const now = new Date();
+            let age = now.getFullYear() - birth.getFullYear();
+            const monthDiff = now.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    showToast('Logout failed', 'danger');
+                }
+            } catch (error) {
+                showToast('An error occurred during logout', 'danger');
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await loadAppointments();
+            await loadHealthTips();
+            await loadHealthProfile();
+        });
+    </script>
+</body>
+</html> 

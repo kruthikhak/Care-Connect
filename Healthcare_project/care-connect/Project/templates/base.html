@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Healthcare Project{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .navbar {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: #333;
+        }
+
+        main {
+            padding: 2rem 0;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .messages {
+            list-style: none;
+            margin-bottom: 1rem;
+        }
+
+        .messages .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.75rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="navbar-brand">Healthcare Project</a>
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'register' %}">Register</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

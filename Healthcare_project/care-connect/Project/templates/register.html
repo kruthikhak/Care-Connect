@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Healthcare Project{% endblock %}
+
+{% block extra_head %}
+<style>
+    .register-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        width: 100%;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <h1>Register</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password1">Password</label>
+            <input type="password" id="password1" name="password1" required>
+        </div>
+        <div class="form-group">
+            <label for="password2">Confirm Password</label>
+            <input type="password" id="password2" name="password2" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    <div class="login-link">
+        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
+    </div>
+</div>
+{% endblock %} 

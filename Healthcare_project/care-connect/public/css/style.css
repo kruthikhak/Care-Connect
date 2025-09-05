@@ -1,0 +1,106 @@
+/* General Styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand i {
+    margin-right: 8px;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
+    color: white;
+    padding: 4rem 0;
+    margin-bottom: 2rem;
+}
+
+/* Search Section */
+.search-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Cards */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Rating Stars */
+.rating {
+    color: #ffc107;
+}
+
+/* Symptom Checker */
+.symptom-checkboxes {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.form-check {
+    margin-bottom: 0.5rem;
+}
+
+/* Toast Notifications */
+.toast {
+    min-width: 300px;
+}
+
+.toast.bg-success {
+    color: white;
+}
+
+.toast.bg-danger {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-container {
+        padding: 1rem;
+    }
+    
+    .card-img-top {
+        height: 150px;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+} 

@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            min-height: 100vh;
+            padding-top: 2rem;
+            position: fixed;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: 100vh;
+            width: calc(100% - 250px);
+            position: relative;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .profile-header {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        /* Section Navigation Styles */
+        .section-nav .nav-link {
+            color: #495057;
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-right: 1rem;
+            border-radius: 8px;
+        }
+
+        .section-nav .nav-link:hover {
+            background: #e9ecef;
+            color: #212529;
+        }
+
+        .section-nav .nav-link.active {
+            background: #4361ee;
+            color: white;
+        }
+
+        .section-nav .nav-link i {
+            width: 20px;
+            text-align: center;
+            margin-right: 0.5rem;
+        }
+
+        .suggestion-card {
+            transition: transform 0.2s;
+            border-left: 4px solid #0d6efd;
+        }
+        .suggestion-card:hover {
+            transform: translateX(5px);
+        }
+        .suggestion-icon {
+            width: 40px;
+            height: 40px;
+            background: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .suggestion-icon i {
+            font-size: 1.2rem;
+            color: #0d6efd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="d-flex flex-column">
+                    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+                        <span class="fs-4 ms-2 text-white">Care Connect</span>
+                    </a>
+                    <hr class="text-white">
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="/symptom-checker" class="nav-link">
+                                <i class="fas fa-clipboard-check"></i>
+                                Symptom Checker
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/appointments" class="nav-link">
+                                <i class="fas fa-calendar-alt"></i>
+                                Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/suggestions" class="nav-link">
+                                <i class="fas fa-lightbulb"></i>
+                                Suggestions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/profile" class="nav-link active">
+                                <i class="fas fa-user"></i>
+                                Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" id="logoutBtn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Profile Header -->
+                <div class="profile-header">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <img src="https://via.placeholder.com/150" alt="Profile Picture" class="profile-picture">
+                        </div>
+                        <div class="col">
+                            <h1 id="user-name">Loading...</h1>
+                            <p class="text-muted mb-0" id="user-email">Loading...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Navigation -->
+                <div class="section-card mb-4">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showSection('personal-info')">
+                                <i class="fas fa-user me-2"></i>Personal Information
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('medical-history')">
+                                <i class="fas fa-notes-medical me-2"></i>Medical History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showSection('settings')">
+                                <i class="fas fa-cog me-2"></i>Account Settings
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Personal Information Section -->
+                <div id="personal-info" class="section-card">
+                    <h2>Personal Information</h2>
+                    <form id="personal-info-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" name="fullName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Date of Birth</label>
+                                <input type="date" class="form-control" name="dateOfBirth" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="phoneNumber" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Gender</label>
+                                <select class="form-select" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Blood Group</label>
+                                <select class="form-select" name="bloodGroup">
+                                    <option value="">Select blood group</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Emergency Contact</label>
+                                <input type="tel" class="form-control" name="emergencyContact" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label class="form-label">Address</label>
+                                <textarea class="form-control" name="address" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Medical History Section -->
+                <div id="medical-history" class="section-card" style="display: none;">
+                    <h2 class="mb-4">Medical History</h2>
+                    <form id="medical-history-form">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-primary text-white">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-user-md me-2"></i>Current Health Status
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Height (cm)</label>
+                                            <input type="number" class="form-control" name="height" min="0" max="300">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Weight (kg)</label>
+                                            <input type="number" class="form-control" name="weight" min="0" max="500">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Current Health Conditions</label>
+                                            <textarea class="form-control" name="healthStatus" rows="4" 
+                                                placeholder="Describe your current health status, including any ongoing symptoms or concerns..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-pills me-2"></i>Current Medications
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="medications-container">
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control" name="medications[]" placeholder="Medication name">
+                                                <input type="text" class="form-control" name="medicationDosage[]" placeholder="Dosage">
+                                                <button type="button" class="btn btn-outline-danger remove-field">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addMedication()">
+                                            <i class="fas fa-plus me-2"></i>Add Medication
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-warning">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-allergies me-2"></i>Allergies
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="allergies-container">
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control" name="allergies[]" placeholder="Allergy">
+                                                <select class="form-select" name="allergySeverity[]">
+                                                    <option value="Mild">Mild</option>
+                                                    <option value="Moderate">Moderate</option>
+                                                    <option value="Severe">Severe</option>
+                                                </select>
+                                                <button type="button" class="btn btn-outline-danger remove-field">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addAllergy()">
+                                            <i class="fas fa-plus me-2"></i>Add Allergy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card h-100">
+                                    <div class="card-header bg-danger text-white">
+                                        <h5 class="card-title mb-0">
+                                            <i class="fas fa-heartbeat me-2"></i>Medical Conditions
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="conditions-container">
+                                            <div class="input-group mb-2">
+                                                <input type="text" class="form-control" name="conditions[]" placeholder="Condition">
+                                                <input type="date" class="form-control" name="conditionDate[]" placeholder="Diagnosed Date">
+                                                <button type="button" class="btn btn-outline-danger remove-field">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addCondition()">
+                                            <i class="fas fa-plus me-2"></i>Add Condition
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Medical History
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Account Settings Section -->
+                <div id="settings" class="section-card" style="display: none;">
+                    <h2>Account Settings</h2>
+                    <form id="settings-form">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Notifications</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="emailNotifications" name="emailNotifications">
+                                    <label class="form-check-label" for="emailNotifications">
+                                        Receive email notifications
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="appointmentReminders" name="appointmentReminders">
+                                    <label class="form-check-label" for="appointmentReminders">
+                                        Appointment reminders
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="medicationReminders" name="medicationReminders">
+                                    <label class="form-check-label" for="medicationReminders">
+                                        Medication reminders
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Privacy</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="profileVisibility" name="profileVisibility">
+                                    <label class="form-check-label" for="profileVisibility">
+                                        Make profile visible to healthcare providers
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input type="checkbox" class="form-check-input" id="shareHealthData" name="shareHealthData">
+                                    <label class="form-check-label" for="shareHealthData">
+                                        Share health data with connected providers
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Settings
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navigation handling
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section-card').forEach(section => {
+                section.style.display = 'none';
+            });
+            // Show selected section
+            document.getElementById(sectionId).style.display = 'block';
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('onclick')?.includes(sectionId)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        // Load profile data
+        async function loadProfile() {
+            try {
+                const response = await fetch('/api/profile');
+                if (!response.ok) throw new Error('Failed to load profile');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const profile = data.profile;
+                    
+                    // Update personal information
+                    document.querySelector('[name="fullName"]').value = profile.fullName || '';
+                    document.querySelector('[name="dateOfBirth"]').value = profile.dateOfBirth || '';
+                    document.querySelector('[name="phoneNumber"]').value = profile.phoneNumber || '';
+                    document.querySelector('[name="gender"]').value = profile.gender || '';
+                    document.querySelector('[name="bloodGroup"]').value = profile.bloodGroup || '';
+                    document.querySelector('[name="emergencyContact"]').value = profile.emergencyContact || '';
+                    document.querySelector('[name="address"]').value = profile.address || '';
+                    
+                    // Update medical history
+                    if (profile.medicalHistory) {
+                        document.querySelector('[name="height"]').value = profile.medicalHistory.height || '';
+                        document.querySelector('[name="weight"]').value = profile.medicalHistory.weight || '';
+                        document.querySelector('[name="healthStatus"]').value = profile.medicalHistory.healthStatus || '';
+                        
+                        // Update medications
+                        const medications = profile.medicalHistory.medications || [];
+                        const dosages = profile.medicalHistory.medicationDosages || [];
+                        document.getElementById('medications-container').innerHTML = '';
+                        medications.forEach((med, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'input-group mb-2';
+                            div.innerHTML = `
+                                <input type="text" class="form-control" name="medications[]" value="${med}" placeholder="Medication name">
+                                <input type="text" class="form-control" name="medicationDosage[]" value="${dosages[i] || ''}" placeholder="Dosage">
+                                <button type="button" class="btn btn-outline-danger remove-field">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            document.getElementById('medications-container').appendChild(div);
+                        });
+                        if (medications.length === 0) addMedication();
+
+                        // Update allergies
+                        const allergies = profile.medicalHistory.allergies || [];
+                        const severities = profile.medicalHistory.allergySeverities || [];
+                        document.getElementById('allergies-container').innerHTML = '';
+                        allergies.forEach((allergy, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'input-group mb-2';
+                            div.innerHTML = `
+                                <input type="text" class="form-control" name="allergies[]" value="${allergy}" placeholder="Allergy">
+                                <select class="form-select" name="allergySeverity[]">
+                                    <option value="Mild" ${severities[i] === 'Mild' ? 'selected' : ''}>Mild</option>
+                                    <option value="Moderate" ${severities[i] === 'Moderate' ? 'selected' : ''}>Moderate</option>
+                                    <option value="Severe" ${severities[i] === 'Severe' ? 'selected' : ''}>Severe</option>
+                                </select>
+                                <button type="button" class="btn btn-outline-danger remove-field">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            document.getElementById('allergies-container').appendChild(div);
+                        });
+                        if (allergies.length === 0) addAllergy();
+
+                        // Update conditions
+                        const conditions = profile.medicalHistory.conditions || [];
+                        const dates = profile.medicalHistory.conditionDates || [];
+                        document.getElementById('conditions-container').innerHTML = '';
+                        conditions.forEach((condition, i) => {
+                            const div = document.createElement('div');
+                            div.className = 'input-group mb-2';
+                            div.innerHTML = `
+                                <input type="text" class="form-control" name="conditions[]" value="${condition}" placeholder="Condition">
+                                <input type="date" class="form-control" name="conditionDate[]" value="${dates[i] || ''}" placeholder="Diagnosed Date">
+                                <button type="button" class="btn btn-outline-danger remove-field">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            document.getElementById('conditions-container').appendChild(div);
+                        });
+                        if (conditions.length === 0) addCondition();
+                    }
+                    
+                    // Update settings
+                    if (profile.settings) {
+                        document.getElementById('emailNotifications').checked = profile.settings.emailNotifications;
+                        document.getElementById('appointmentReminders').checked = profile.settings.appointmentReminders;
+                        document.getElementById('medicationReminders').checked = profile.settings.medicationReminders;
+                        document.getElementById('profileVisibility').checked = profile.settings.profileVisibility;
+                        document.getElementById('shareHealthData').checked = profile.settings.shareHealthData;
+                    }
+                    
+                    // Update header
+                    document.getElementById('user-name').textContent = profile.fullName || 'User Profile';
+                    document.getElementById('user-email').textContent = profile.email || 'demo@example.com';
+                }
+            } catch (error) {
+                showToast('Failed to load profile data: ' + error.message, 'danger');
+            }
+        }
+
+        // Add new field functions
+        function addMedication() {
+            const container = document.getElementById('medications-container');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <input type="text" class="form-control" name="medications[]" placeholder="Medication name">
+                <input type="text" class="form-control" name="medicationDosage[]" placeholder="Dosage">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addAllergy() {
+            const container = document.getElementById('allergies-container');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <input type="text" class="form-control" name="allergies[]" placeholder="Allergy">
+                <select class="form-select" name="allergySeverity[]">
+                    <option value="Mild">Mild</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Severe">Severe</option>
+                </select>
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        function addCondition() {
+            const container = document.getElementById('conditions-container');
+            const div = document.createElement('div');
+            div.className = 'input-group mb-2';
+            div.innerHTML = `
+                <input type="text" class="form-control" name="conditions[]" placeholder="Condition">
+                <input type="date" class="form-control" name="conditionDate[]" placeholder="Diagnosed Date">
+                <button type="button" class="btn btn-outline-danger remove-field">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+
+        // Form submission handlers
+        document.getElementById('personal-info-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const updates = {
+                fullName: formData.get('fullName'),
+                dateOfBirth: formData.get('dateOfBirth'),
+                phoneNumber: formData.get('phoneNumber'),
+                gender: formData.get('gender'),
+                bloodGroup: formData.get('bloodGroup'),
+                emergencyContact: formData.get('emergencyContact'),
+                address: formData.get('address')
+            };
+            await updateProfile(updates);
+        });
+
+        document.getElementById('medical-history-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const updates = {
+                medicalHistory: {
+                    height: formData.get('height'),
+                    weight: formData.get('weight'),
+                    healthStatus: formData.get('healthStatus'),
+                    medications: [...formData.getAll('medications[]')].filter(Boolean),
+                    medicationDosages: [...formData.getAll('medicationDosage[]')].filter(Boolean),
+                    allergies: [...formData.getAll('allergies[]')].filter(Boolean),
+                    allergySeverities: [...formData.getAll('allergySeverity[]')].filter(Boolean),
+                    conditions: [...formData.getAll('conditions[]')].filter(Boolean),
+                    conditionDates: [...formData.getAll('conditionDate[]')].filter(Boolean)
+                }
+            };
+            await updateProfile(updates);
+        });
+
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updates = {
+                settings: {
+                    emailNotifications: document.getElementById('emailNotifications').checked,
+                    appointmentReminders: document.getElementById('appointmentReminders').checked,
+                    medicationReminders: document.getElementById('medicationReminders').checked,
+                    profileVisibility: document.getElementById('profileVisibility').checked,
+                    shareHealthData: document.getElementById('shareHealthData').checked
+                }
+            };
+            await updateProfile(updates);
+        });
+
+        // Profile update function
+        async function updateProfile(updates) {
+            try {
+                const response = await fetch('/api/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updates)
+                });
+                
+                if (!response.ok) throw new Error('Failed to update profile');
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Profile updated successfully');
+                    loadProfile();
+                } else {
+                    throw new Error(data.message || 'Failed to update profile');
+                }
+            } catch (error) {
+                showToast(error.message, 'danger');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProfile();
+            showSection('personal-info');
+        });
+
+        // Logout handler
+        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                const response = await fetch('/api/auth/logout', {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    window.location.href = '/login';
+                } else {
+                    throw new Error('Failed to logout');
+                }
+            } catch (error) {
+                showToast('Failed to logout: ' + error.message, 'danger');
+            }
+        });
+    </script>
+</body>
+</html> 

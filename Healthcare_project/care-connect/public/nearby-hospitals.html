@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Nearby Hospitals - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 10px;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .hospital-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .distance-badge {
+            background: #4361ee;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .location-status {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .btn-primary {
+            background: #4361ee;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #3046c9;
+            transform: translateY(-2px);
+        }
+
+        .hospital-icon {
+            width: 30px;
+            height: 30px;
+            background: #4361ee;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-icon {
+            width: 30px;
+            height: 30px;
+            background: #ef233c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .filter-section {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .filter-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            margin: 0.25rem;
+            background: #e9ecef;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-badge.active {
+            background: #4361ee;
+            color: white;
+        }
+
+        .filter-badge:hover {
+            background: #4361ee;
+            color: white;
+        }
+
+        .error-message {
+            color: #ef233c;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            background: #fff5f5;
+            border: 1px solid #ffd7d7;
+        }
+
+        .retry-button {
+            background: #ef233c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-button:hover {
+            background: #d90429;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Care Connect</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/nearby-hospitals.html">Find Hospitals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile.html">Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container search-container">
+        <h1 class="mb-4">Find Nearby Hospitals</h1>
+        
+        <div class="location-status" id="locationStatus">
+            <p class="mb-0">Please allow location access to find hospitals near you.</p>
+        </div>
+
+        <div class="filter-section">
+            <h5>Filter by:</h5>
+            <div class="mb-3">
+                <span class="filter-badge active" data-filter="distance">Distance</span>
+                <span class="filter-badge" data-filter="rating">Rating</span>
+                <span class="filter-badge" data-filter="specialty">Specialty</span>
+            </div>
+            <div id="specialtyFilters" style="display: none;">
+                <span class="filter-badge" data-specialty="Emergency">Emergency</span>
+                <span class="filter-badge" data-specialty="Cardiology">Cardiology</span>
+                <span class="filter-badge" data-specialty="Pediatrics">Pediatrics</span>
+                <span class="filter-badge" data-specialty="Orthopedics">Orthopedics</span>
+                <span class="filter-badge" data-specialty="Neurology">Neurology</span>
+                <span class="filter-badge" data-specialty="Oncology">Oncology</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div id="map"></div>
+            </div>
+            <div class="col-md-4">
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Finding nearby hospitals...</p>
+                </div>
+                <div id="hospitalList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        let map;
+        let userMarker;
+        let hospitalMarkers = [];
+        let userLocation = null;
+        let allHospitals = [];
+        let currentFilter = 'distance';
+        let selectedSpecialty = null;
+        let searchRadius = 10; // Default radius in kilometers
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([0, 0], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+
+        // Calculate distance between two points using Haversine formula
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = deg2rad(lat2 - lat1);
+            const dLon = deg2rad(lon2 - lon1);
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI/180);
+        }
+
+        // Find k nearest hospitals
+        function findKNearest(hospitals, k = 5) {
+            return hospitals
+                .map(hospital => ({
+                    ...hospital,
+                    distance: calculateDistance(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        hospital.latitude,
+                        hospital.longitude
+                    )
+                }))
+                .sort((a, b) => a.distance - b.distance)
+                .slice(0, k);
+        }
+
+        // Filter hospitals by rating
+        function filterByRating(hospitals, minRating = 4.0) {
+            return hospitals
+                .filter(hospital => hospital.rating >= minRating)
+                .sort((a, b) => b.rating - a.rating);
+        }
+
+        // Filter hospitals by specialty
+        function filterBySpecialty(hospitals, specialty) {
+            return hospitals
+                .filter(hospital => hospital.specialties.includes(specialty))
+                .map(hospital => ({
+                    ...hospital,
+                    distance: calculateDistance(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        hospital.latitude,
+                        hospital.longitude
+                    )
+                }))
+                .sort((a, b) => a.distance - b.distance);
+        }
+
+        // Update map markers
+        function updateMarkers(hospitals) {
+            // Clear existing hospital markers
+            hospitalMarkers.forEach(marker => map.removeLayer(marker));
+            hospitalMarkers = [];
+
+            // Add user marker
+            if (userMarker) {
+                map.removeLayer(userMarker);
+            }
+            userMarker = L.marker([userLocation.latitude, userLocation.longitude], {
+                icon: L.divIcon({
+                    className: 'user-icon',
+                    html: 'U',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map);
+
+            // Add hospital markers
+            hospitals.forEach((hospital, index) => {
+                const marker = L.marker([hospital.latitude, hospital.longitude], {
+                    icon: L.divIcon({
+                        className: 'hospital-icon',
+                        html: (index + 1).toString(),
+                        iconSize: [30, 30]
+                    })
+                }).addTo(map);
+                
+                marker.bindPopup(`
+                    <strong>${hospital.name}</strong><br>
+                    Distance: ${hospital.distance.toFixed(1)} km<br>
+                    ${hospital.address}<br>
+                    Rating: ${hospital.rating}⭐
+                `);
+                
+                hospitalMarkers.push(marker);
+            });
+
+            // Fit map bounds to show all markers
+            const bounds = L.latLngBounds([
+                [userLocation.latitude, userLocation.longitude],
+                ...hospitals.map(h => [h.latitude, h.longitude])
+            ]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        // Display hospital list
+        function displayHospitals(hospitals) {
+            const hospitalList = document.getElementById('hospitalList');
+            hospitalList.innerHTML = '';
+
+            if (hospitals.length === 0) {
+                hospitalList.innerHTML = `
+                    <div class="hospital-card">
+                        <p class="text-center">No hospitals found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            hospitals.forEach((hospital, index) => {
+                const card = document.createElement('div');
+                card.className = 'hospital-card';
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">${index + 1}. ${hospital.name}</h5>
+                        <span class="distance-badge">${hospital.distance.toFixed(1)} km</span>
+                    </div>
+                    <p class="mb-2">${hospital.address}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Rating: ${hospital.rating}⭐</span>
+                        <button class="btn btn-primary btn-sm" onclick="bookAppointment('${hospital.id}')">
+                            Book Appointment
+                        </button>
+                    </div>
+                `;
+                hospitalList.appendChild(card);
+            });
+        }
+
+        // Get user's location
+        function getUserLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation is not supported by your browser'));
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        userLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        resolve(userLocation);
+                    },
+                    error => {
+                        let errorMessage = 'Unable to retrieve your location.';
+                        if (error.code === 1) {
+                            errorMessage = 'Location access denied. Please enable location services to find nearby hospitals.';
+                        } else if (error.code === 2) {
+                            errorMessage = 'Location unavailable. Please check your device settings.';
+                        } else if (error.code === 3) {
+                            errorMessage = 'Location request timed out. Please try again.';
+                        }
+                        reject(new Error(errorMessage));
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+        }
+
+        // Fetch hospitals from API
+        async function fetchHospitals() {
+            try {
+                const response = await fetch(`/api/hospitals/nearby/${userLocation.latitude}/${userLocation.longitude}/${searchRadius}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch hospital data');
+                }
+                allHospitals = await response.json();
+                return allHospitals;
+            } catch (error) {
+                console.error('Error fetching hospitals:', error);
+                throw error;
+            }
+        }
+
+        // Apply filters to hospitals
+        function applyFilters() {
+            let filteredHospitals = [...allHospitals];
+            
+            // Add distance to all hospitals
+            filteredHospitals = filteredHospitals.map(hospital => ({
+                ...hospital,
+                distance: calculateDistance(
+                    userLocation.latitude,
+                    userLocation.longitude,
+                    hospital.latitude,
+                    hospital.longitude
+                )
+            }));
+            
+            // Apply selected filter
+            if (currentFilter === 'distance') {
+                filteredHospitals = findKNearest(filteredHospitals);
+            } else if (currentFilter === 'rating') {
+                filteredHospitals = filterByRating(filteredHospitals);
+            } else if (currentFilter === 'specialty' && selectedSpecialty) {
+                filteredHospitals = filterBySpecialty(filteredHospitals, selectedSpecialty);
+            }
+            
+            // Update UI based on results
+            if (filteredHospitals.length === 0) {
+                const status = document.getElementById('locationStatus');
+                status.innerHTML = `
+                    <div class="alert alert-warning">
+                        <p class="mb-0">No hospitals found within ${searchRadius}km. Try increasing the search radius or selecting a different specialty.</p>
+                    </div>
+                `;
+                document.getElementById('hospitalList').innerHTML = `
+                    <div class="hospital-card">
+                        <p class="text-center">No hospitals found. Please try:</p>
+                        <ul class="list-unstyled">
+                            <li>✓ Increasing the search radius (currently ${searchRadius}km)</li>
+                            <li>✓ Selecting a different specialty</li>
+                            <li>✓ Adjusting the rating filter</li>
+                        </ul>
+                    </div>
+                `;
+                // Clear map markers
+                hospitalMarkers.forEach(marker => map.removeLayer(marker));
+                hospitalMarkers = [];
+            } else {
+                updateMarkers(filteredHospitals);
+                displayHospitals(filteredHospitals);
+                
+                const status = document.getElementById('locationStatus');
+                status.innerHTML = `
+                    <div class="alert alert-success">
+                        <p class="mb-0">Found ${filteredHospitals.length} hospitals within ${searchRadius}km!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialize page
+        async function initializePage() {
+            try {
+                initMap();
+                const status = document.getElementById('locationStatus');
+                status.innerHTML = '<div class="alert alert-info"><p class="mb-0">Getting your location...</p></div>';
+                
+                await getUserLocation();
+                status.innerHTML = '<div class="alert alert-info"><p class="mb-0">Location found! Finding nearby hospitals...</p></div>';
+                
+                document.getElementById('loadingSpinner').style.display = 'block';
+                
+                // Fetch hospitals from API
+                await fetchHospitals();
+                
+                if (allHospitals.length === 0) {
+                    throw new Error('No hospitals found in the database');
+                }
+                
+                // Apply initial filter
+                applyFilters();
+                
+                document.getElementById('loadingSpinner').style.display = 'none';
+            } catch (error) {
+                document.getElementById('loadingSpinner').style.display = 'none';
+                const status = document.getElementById('locationStatus');
+                status.innerHTML = `
+                    <div class="alert alert-danger">
+                        <p class="mb-0">Error: ${error.message}</p>
+                        <button class="btn btn-danger mt-2" onclick="retryInitialization()">
+                            <i class="fas fa-redo"></i> Retry
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Retry initialization
+        function retryInitialization() {
+            initializePage();
+        }
+
+        // Book appointment function
+        function bookAppointment(hospitalId) {
+            window.location.href = `/booking.html?hospital=${hospitalId}`;
+        }
+
+        // Set up filter event listeners
+        function setupFilters() {
+            const filterBadges = document.querySelectorAll('.filter-badge[data-filter]');
+            filterBadges.forEach(badge => {
+                badge.addEventListener('click', () => {
+                    // Update active state
+                    filterBadges.forEach(b => b.classList.remove('active'));
+                    badge.classList.add('active');
+                    
+                    // Update current filter
+                    currentFilter = badge.dataset.filter;
+                    
+                    // Show/hide specialty filters
+                    const specialtyFilters = document.getElementById('specialtyFilters');
+                    if (currentFilter === 'specialty') {
+                        specialtyFilters.style.display = 'block';
+                    } else {
+                        specialtyFilters.style.display = 'none';
+                        selectedSpecialty = null;
+                    }
+                    
+                    // Apply filters
+                    applyFilters();
+                });
+            });
+            
+            // Set up specialty filter event listeners
+            const specialtyBadges = document.querySelectorAll('.filter-badge[data-specialty]');
+            specialtyBadges.forEach(badge => {
+                badge.addEventListener('click', () => {
+                    // Update active state
+                    specialtyBadges.forEach(b => b.classList.remove('active'));
+                    badge.classList.add('active');
+                    
+                    // Update selected specialty
+                    selectedSpecialty = badge.dataset.specialty;
+                    
+                    // Apply filters
+                    applyFilters();
+                });
+            });
+
+            // Set up radius slider
+            const radiusSlider = document.getElementById('radiusSlider');
+            const radiusValue = document.getElementById('radiusValue');
+            
+            radiusSlider.addEventListener('input', () => {
+                searchRadius = parseInt(radiusSlider.value);
+                radiusValue.textContent = searchRadius;
+            });
+            
+            radiusSlider.addEventListener('change', async () => {
+                document.getElementById('loadingSpinner').style.display = 'block';
+                try {
+                    await fetchHospitals();
+                    applyFilters();
+                } catch (error) {
+                    console.error('Error updating radius:', error);
+                    const status = document.getElementById('locationStatus');
+                    status.innerHTML = `
+                        <div class="alert alert-danger">
+                            <p class="mb-0">Error updating search radius: ${error.message}</p>
+                        </div>
+                    `;
+                } finally {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', () => {
+            initializePage();
+            setupFilters();
+        });
+    </script>
+</body>
+</html> 

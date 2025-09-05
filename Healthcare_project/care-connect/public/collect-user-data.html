@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Your Profile - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .profile-setup-card {
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .progress-indicator::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+        .progress-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 2px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 1;
+            position: relative;
+        }
+        .progress-step.active {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        .progress-step.completed {
+            background-color: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-hospital me-2"></i>Care Connect
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card profile-setup-card">
+                    <div class="card-body p-5">
+                        <h2 class="text-center mb-4">Complete Your Profile</h2>
+                        <p class="text-center text-muted mb-5">Please provide some additional information to help us personalize your experience.</p>
+                        
+                        <div class="progress-indicator mb-5">
+                            <div class="progress-step completed">
+                                <i class="bi bi-check"></i>
+                            </div>
+                            <div class="progress-step active">2</div>
+                            <div class="progress-step">3</div>
+                        </div>
+                        
+                        <form id="profileForm">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control form-control-lg" id="name" placeholder="Your full name" required>
+                                <div class="form-text">This is how we'll address you on the platform.</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control form-control-lg" id="age" min="1" max="120" placeholder="Your age" required>
+                                <div class="form-text">This helps us provide age-appropriate recommendations.</div>
+                            </div>
+                            
+                            <div class="mb-5">
+                                <label for="locality" class="form-label">Locality/Address</label>
+                                <textarea class="form-control form-control-lg" id="locality" rows="3" placeholder="Your address or locality" required></textarea>
+                                <div class="form-text">We'll use this to show you hospitals and services near you.</div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary btn-lg">Complete Setup</button>
+                                <button type="button" class="btn btn-outline-secondary" id="skipButton">Skip for Now</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        By continuing, you agree to our 
+                        <a href="#" class="text-decoration-none">Terms of Service</a> and 
+                        <a href="#" class="text-decoration-none">Privacy Policy</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize with demo user data
+        let userData = {
+            firstName: 'Demo',
+            lastName: 'User',
+            email: 'demo@example.com',
+            age: '',
+            locality: ''
+        };
+        
+        // Check if user is authenticated - for demo, always consider user is authenticated
+        function initializeApp() {
+            try {
+                // Pre-fill name if available
+                if (userData.firstName || userData.lastName) {
+                    const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim();
+                    document.getElementById('name').value = fullName;
+                }
+                
+                // Set up event handlers
+                setupEventListeners();
+                
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                alert('There was an error loading your profile. Please try again later.');
+            }
+        }
+        
+        function setupEventListeners() {
+            // Handle form submission
+            document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // Get form values
+                const name = document.getElementById('name').value;
+                const age = document.getElementById('age').value;
+                const locality = document.getElementById('locality').value;
+                
+                // Split name into first and last name (best effort)
+                const nameParts = name.trim().split(' ');
+                const firstName = nameParts[0] || '';
+                const lastName = nameParts.slice(1).join(' ') || '';
+                
+                // Save to user profile
+                await saveUserProfile({
+                    firstName,
+                    lastName,
+                    age,
+                    locality
+                });
+            });
+            
+            // Handle skip button
+            document.getElementById('skipButton').addEventListener('click', () => {
+                window.location.href = '/hospitals.html';
+            });
+        }
+        
+        async function saveUserProfile(formData) {
+            try {
+                // Show loading state
+                const submitButton = document.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                submitButton.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...`;
+                submitButton.disabled = true;
+                
+                // Update user data in memory for demo
+                userData = {
+                    ...userData,
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    age: formData.age,
+                    locality: formData.locality
+                };
+                
+                // For demo purposes, just redirect after a short delay
+                setTimeout(() => {
+                    window.location.href = '/hospitals.html';
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('There was an error saving your profile. Please try again.');
+                
+                // Reset button
+                const submitButton = document.querySelector('button[type="submit"]');
+                submitButton.innerHTML = 'Complete Setup';
+                submitButton.disabled = false;
+            }
+        }
+        
+        // Initialize the app when the document is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html> 

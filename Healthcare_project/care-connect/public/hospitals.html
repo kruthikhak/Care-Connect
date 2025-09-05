@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitals - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .hospital-card {
+            transition: transform 0.2s;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        .hospital-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .rating-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+        .filters-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .text-primary {
+            color: #4361ee !important;
+        }
+        .btn-primary {
+            background-color: #4361ee;
+            border-color: #4361ee;
+        }
+        .btn-primary:hover {
+            background-color: #3a56d4;
+            border-color: #3a56d4;
+        }
+        .btn-outline-primary {
+            color: #4361ee;
+            border-color: #4361ee;
+        }
+        .btn-outline-primary:hover {
+            background-color: #4361ee;
+            border-color: #4361ee;
+        }
+        .bg-primary {
+            background-color: #4361ee !important;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        #resultsCount {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="bi bi-hospital"></i> Care Connect</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/hospitals.html">Hospitals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Favorites</a>
+                    </li>
+                </ul>
+                <div class="d-flex">
+                    <div class="user-info text-white me-3" id="userInfo">
+                        <img src="https://ui-avatars.com/api/?name=User&size=32&background=random" alt="User" class="user-avatar" id="userAvatar">
+                        <span id="userName">User</span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-light dropdown-toggle btn-sm" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-gear"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/profile.html"><i class="bi bi-person me-2"></i>Edit Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><button class="dropdown-item" id="signOutButton"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</button></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <div class="filters-section">
+                    <h5 class="mb-3">Filters</h5>
+                    <div class="mb-3">
+                        <label for="searchInput" class="form-label">Search by Name or Location</label>
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Hospital name, city, state...">
+                            <button class="btn btn-primary" type="button" id="searchButton">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">Search for hospitals by name, city, state, or address</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="stateFilter" class="form-label">State</label>
+                        <select id="stateFilter" class="form-select">
+                            <option value="">All States</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cityFilter" class="form-label">City</label>
+                        <select id="cityFilter" class="form-select">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ratingFilter" class="form-label">Minimum Rating</label>
+                        <select id="ratingFilter" class="form-select">
+                            <option value="">Any Rating</option>
+                            <option value="4.5">4.5+ Stars</option>
+                            <option value="4">4+ Stars</option>
+                            <option value="3.5">3.5+ Stars</option>
+                        </select>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="nearbyFilter">
+                        <label class="form-check-label" for="nearbyFilter">Nearby Hospitals</label>
+                        <div class="form-text">Show hospitals near your locality</div>
+                    </div>
+                    <button id="resetFilters" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-arrow-repeat"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+            
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="m-0">Hospital Directory</h3>
+                    <div>
+                        <span id="resultsCount">0</span> results found
+                    </div>
+                </div>
+                
+                <div id="hospitalCards" class="row g-4"></div>
+
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="Hospital pagination">
+                        <ul class="pagination" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
+        let stats = {};
+        let userId = 'demo-user';  // Use a fixed demo user ID
+        let hospitalData = { hospitals: [] };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Demo user data
+                const userData = {
+                    firstName: 'Demo',
+                    lastName: 'User',
+                    email: 'demo@example.com',
+                    profileImageUrl: 'https://ui-avatars.com/api/?name=Demo+User&background=random'
+                };
+                
+                // Update user info in navbar
+                document.getElementById('userName').textContent = userData.firstName || 'User';
+                if (userData.profileImageUrl) {
+                    document.getElementById('userAvatar').src = userData.profileImageUrl;
+                }
+                
+                // Sign out button redirects to home
+                document.getElementById('signOutButton').addEventListener('click', () => {
+                    window.location.href = '/';
+                });
+            } catch (error) {
+                console.error('Error initializing user info:', error);
+                document.getElementById('userName').textContent = 'Demo User';
+            }
+
+            // Initialize the app - fetch stats first, which will then trigger hospital fetch
+            fetchStats();
+
+            // Set up event listeners for filters
+            let searchTimeout = null;
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                // Clear previous timeout
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                }
+                
+                // Set a new timeout to avoid excessive API calls while typing
+                searchTimeout = setTimeout(() => {
+                    currentPage = 1;
+                    fetchHospitals();
+                }, 300); // Wait 300ms after user stops typing
+            });
+            
+            // Add event listener for the search button
+            document.getElementById('searchButton').addEventListener('click', () => {
+                currentPage = 1;
+                fetchHospitals();
+            });
+            
+            // Add event listener for Enter key on search input
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    currentPage = 1;
+                    fetchHospitals();
+                }
+            });
+
+            document.getElementById('stateFilter').addEventListener('change', () => {
+                updateCityFilter();
+                currentPage = 1;
+                fetchHospitals();
+            });
+
+            document.getElementById('cityFilter').addEventListener('change', () => {
+                currentPage = 1;
+                fetchHospitals();
+            });
+
+            document.getElementById('ratingFilter').addEventListener('change', () => {
+                currentPage = 1;
+                fetchHospitals();
+            });
+            
+            document.getElementById('nearbyFilter').addEventListener('change', () => {
+                currentPage = 1;
+                fetchHospitals();
+            });
+
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('stateFilter').value = '';
+                document.getElementById('cityFilter').value = '';
+                document.getElementById('ratingFilter').value = '';
+                document.getElementById('nearbyFilter').checked = false;
+                currentPage = 1;
+                fetchHospitals();
+            });
+        });
+
+        async function fetchStats() {
+            try {
+                const response = await fetch('/api/stats');
+                stats = await response.json();
+                
+                // Update filters with stats data
+                updateFilters();
+                
+                // Now that we have stats, fetch hospitals
+                fetchHospitals();
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        async function fetchHospitals() {
+            try {
+                const search = document.getElementById('searchInput').value.trim();
+                const state = document.getElementById('stateFilter').value;
+                const city = document.getElementById('cityFilter').value;
+                const rating = document.getElementById('ratingFilter').value;
+                const nearby = document.getElementById('nearbyFilter').checked;
+                
+                // Build query parameters
+                const params = new URLSearchParams();
+                params.append('page', currentPage);
+                params.append('limit', 9); // Show 9 hospitals per page
+                
+                if (search) {
+                    params.append('search', search);
+                }
+                
+                if (state) {
+                    params.append('state', state);
+                }
+                
+                if (city) {
+                    params.append('city', city);
+                }
+                
+                if (rating) {
+                    params.append('minRating', rating);
+                }
+                
+                if (nearby) {
+                    params.append('nearby', 'true');
+                    params.append('userId', userId || 'demo-user');
+                }
+                
+                const response = await fetch(`/api/hospitals?${params.toString()}`);
+                const data = await response.json();
+                
+                if (data && data.hospitals) {
+                    displayHospitals(data.hospitals);
+                    totalPages = data.totalPages || 1;
+                    document.getElementById('resultsCount').textContent = data.total || 0;
+                    renderPagination();
+                } else {
+                    displayHospitals([]);
+                    document.getElementById('resultsCount').textContent = '0';
+                }
+            } catch (error) {
+                console.error('Error fetching hospitals:', error);
+                displayHospitals([]);
+                document.getElementById('resultsCount').textContent = '0';
+            }
+        }
+
+        function displayHospitals(hospitals) {
+            const container = document.getElementById('hospitalCards');
+            container.innerHTML = '';
+
+            if (hospitals.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-search" style="font-size: 3rem; color: #ccc;"></i>
+                        <h4 class="mt-3">No hospitals found</h4>
+                        <p class="text-muted">Try adjusting your search filters</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Get user favorites
+            fetchFavorites().then(favorites => {
+                const favoriteIds = favorites.map(hospital => hospital.hospital_id);
+                
+                hospitals.forEach(hospital => {
+                    const isFavorite = favoriteIds.includes(hospital.hospital_id);
+                    const card = document.createElement('div');
+                    card.className = 'col-md-6 col-lg-4';
+                    card.innerHTML = `
+                        <div class="card hospital-card h-100">
+                            <div class="position-relative">
+                                <img src="https://source.unsplash.com/300x200/?hospital,medical,clinic&sig=${hospital.hospital_id}" 
+                                    class="card-img-top" alt="Hospital Image">
+                                <span class="badge bg-primary rating-badge">
+                                    ${hospital.rating} ⭐
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">${hospital.name || 'Hospital #' + hospital.hospital_id}</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">${hospital.city}, ${hospital.state}</h6>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt"></i> ${hospital.address || hospital.district}<br>
+                                        <i class="bi bi-people"></i> Population Density: ${hospital.density}<br>
+                                        <i class="bi bi-chat-left-text"></i> ${hospital.review_count} reviews
+                                    </small>
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0">
+                                <div class="d-flex justify-content-between">
+                                    <a href="https://maps.google.com/?q=${hospital.location.latitude},${hospital.location.longitude}" 
+                                       target="_blank" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-map"></i> View on Map
+                                    </a>
+                                    <button class="btn ${isFavorite ? 'btn-danger' : 'btn-outline-danger'} btn-sm favorite-btn" data-hospital-id="${hospital.hospital_id}">
+                                        <i class="bi bi-${isFavorite ? 'heart-fill' : 'heart'}"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Add event listeners to favorite buttons
+                document.querySelectorAll('.favorite-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const hospitalId = e.currentTarget.dataset.hospitalId;
+                        toggleFavorite(hospitalId, e.currentTarget);
+                    });
+                });
+            });
+        }
+
+        async function toggleFavorite(hospitalId, button) {
+            try {
+                const isFavorite = button.classList.contains('btn-danger');
+                let response;
+                
+                if (isFavorite) {
+                    // Remove from favorites
+                    response = await fetch(`/api/favorites/${hospitalId}?userId=${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } else {
+                    // Add to favorites
+                    response = await fetch('/api/favorites', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            hospitalId: hospitalId,
+                            userId: userId
+                        })
+                    });
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Toggle button appearance
+                    if (isFavorite) {
+                        button.innerHTML = '<i class="bi bi-heart"></i>';
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-outline-danger');
+                        // Find hospital name for better notification
+                        const hospitalName = findHospitalNameById(hospitalId);
+                        showToast(`${hospitalName} removed from favorites`);
+                    } else {
+                        button.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                        button.classList.remove('btn-outline-danger');
+                        button.classList.add('btn-danger');
+                        // Find hospital name for better notification
+                        const hospitalName = findHospitalNameById(hospitalId);
+                        showToast(`${hospitalName} added to favorites`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                showToast('Failed to update favorites. Please try again.', true);
+            }
+        }
+
+        // Function to fetch user favorites
+        async function fetchFavorites() {
+            try {
+                const response = await fetch('/api/favorites?userId=' + userId);
+                const data = await response.json();
+                return data.favorites || [];
+            } catch (error) {
+                console.error('Error fetching favorites:', error);
+                return [];
+            }
+        }
+
+        // Add a toast notification system
+        function showToast(message, isError = false) {
+            // Create toast container if it doesn't exist
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+                toastContainer.style.zIndex = '5';
+                document.body.appendChild(toastContainer);
+            }
+            
+            // Create toast
+            const toastId = `toast-${Date.now()}`;
+            const toast = document.createElement('div');
+            toast.className = `toast ${isError ? 'bg-danger text-white' : ''}`;
+            toast.id = toastId;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="toast-header ${isError ? 'bg-danger text-white' : ''}">
+                    <strong class="me-auto">${isError ? 'Error' : 'Success'}</strong>
+                    <button type="button" class="btn-close ${isError ? 'btn-close-white' : ''}" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show toast
+            const bsToast = new bootstrap.Toast(toast, { autohide: true, delay: 3000 });
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', () => {
+                toast.remove();
+            });
+        }
+
+        function updateFilters() {
+            const stateFilter = document.getElementById('stateFilter');
+            const cityFilter = document.getElementById('cityFilter');
+
+            // Clear existing options
+            stateFilter.innerHTML = '<option value="">All States</option>';
+            cityFilter.innerHTML = '<option value="">All Cities</option>';
+
+            // Make sure stats.states exists before using it
+            if (stats.states && stats.states.length) {
+                // Add states to filter
+                stats.states.forEach(state => {
+                    stateFilter.innerHTML += `<option value="${state}">${state}</option>`;
+                });
+
+                // Add event listener to state filter
+                stateFilter.addEventListener('change', updateCityFilter);
+            }
+            
+            // Initialize city filter with all cities
+            if (stats.cities && stats.cities.length) {
+                stats.cities.forEach(city => {
+                    cityFilter.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+            }
+        }
+
+        function updateCityFilter() {
+            const stateFilter = document.getElementById('stateFilter');
+            const cityFilter = document.getElementById('cityFilter');
+            const selectedState = stateFilter.value;
+            
+            // Clear current options
+            cityFilter.innerHTML = '<option value="">All Cities</option>';
+            
+            if (selectedState && stats.citiesByState) {
+                // If a state is selected, fetch cities for that state
+                const cities = stats.citiesByState[selectedState];
+                if (cities && cities.length) {
+                    cities.forEach(city => {
+                        cityFilter.innerHTML += `<option value="${city}">${city}</option>`;
+                    });
+                }
+            } else if (stats.cities) {
+                // If no state selected, show all cities
+                stats.cities.forEach(city => {
+                    cityFilter.innerHTML += `<option value="${city}">${city}</option>`;
+                });
+            }
+        }
+
+        function updatePagination(pages) {
+            totalPages = pages;
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // Previous button
+            pagination.innerHTML += `
+                <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage - 1}); return false;">Previous</a>
+                </li>
+            `;
+
+            // Page numbers
+            for (let i = 1; i <= pages; i++) {
+                if (i === 1 || i === pages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    pagination.innerHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changePage(${i}); return false;">${i}</a>
+                        </li>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    pagination.innerHTML += `
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">...</a>
+                        </li>
+                    `;
+                }
+            }
+
+            // Next button
+            pagination.innerHTML += `
+                <li class="page-item ${currentPage === pages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${currentPage + 1}); return false;">Next</a>
+                </li>
+            `;
+        }
+
+        function changePage(page) {
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                fetchHospitals();
+                // Scroll to top of results
+                document.querySelector('.col-lg-9').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderPagination() {
+            updatePagination(totalPages);
+        }
+
+        // Helper function to find hospital name by ID
+        function findHospitalNameById(hospitalId) {
+            // Search in the current displayed hospitals first
+            const displayedHospital = document.querySelector(`.favorite-btn[data-hospital-id="${hospitalId}"]`)?.closest('.card')?.querySelector('.card-title')?.textContent;
+            if (displayedHospital) {
+                return displayedHospital;
+            }
+            // Fallback to ID if name not found
+            return hospitalId;
+        }
+    </script>
+    
+    <!-- Chatbot Integration -->
+    <script src="./js/chatbot.js"></script>
+    <script src="./js/chatbot-ui.js"></script>
+</body>
+</html> 

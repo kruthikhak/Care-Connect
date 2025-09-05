@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews & Feedback - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            min-height: 100vh;
+            padding-top: 2rem;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1rem;
+            margin: 0.2rem 0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        .main-content {
+            padding: 2rem;
+        }
+
+        .feedback-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .rating-group {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2rem;
+            color: #ffc107;
+        }
+
+        .rating-group i {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rating-group i:hover {
+            transform: scale(1.1);
+        }
+
+        .experience-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #4361ee;
+        }
+
+        .satisfaction-options {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .satisfaction-option {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .satisfaction-option:hover,
+        .satisfaction-option.selected {
+            border-color: #4361ee;
+            background-color: #f8f9fa;
+        }
+
+        .satisfaction-option i {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #4361ee;
+        }
+
+        .reviews-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-card {
+            border-left: 4px solid #4361ee;
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <h4 class="text-center mb-4">Care Connect</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="/dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="/symptom-checker">
+                        <i class="bi bi-clipboard2-pulse"></i> Symptom Checker
+                    </a>
+                    <a class="nav-link" href="/appointments">
+                        <i class="bi bi-calendar-check"></i> Appointments
+                    </a>
+                    <a class="nav-link" href="/suggestions">
+                        <i class="bi bi-lightbulb"></i> Suggestions
+                    </a>
+                    <a class="nav-link" href="/facilities">
+                        <i class="bi bi-hospital"></i> Find Facilities
+                    </a>
+                    <a class="nav-link active" href="/reviews">
+                        <i class="bi bi-star"></i> Share Feedback
+                    </a>
+                    <a class="nav-link" href="/profile">
+                        <i class="bi bi-person"></i> Profile
+                    </a>
+                    <a class="nav-link" href="#" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <h2 class="mb-4">Share Your Experience</h2>
+                <p class="text-muted mb-4">Your feedback helps us improve our services and provide better healthcare recommendations.</p>
+
+                <!-- Feedback Form -->
+                <div class="feedback-form">
+                    <form id="feedbackForm">
+                        <!-- Recent Experience -->
+                        <div class="experience-card">
+                            <h5>Recent Healthcare Experience</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Which facility did you visit?</label>
+                                <select class="form-select" id="facilitySelect" required>
+                                    <option value="">Select a facility</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">When did you visit?</label>
+                                <input type="date" class="form-control" id="visitDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Purpose of Visit</label>
+                                <input type="text" class="form-control" id="visitPurpose" placeholder="E.g., Regular checkup, Specific treatment, etc." required>
+                            </div>
+                        </div>
+
+                        <!-- Satisfaction Rating -->
+                        <div class="experience-card">
+                            <h5>Overall Satisfaction</h5>
+                            <div class="satisfaction-options">
+                                <div class="satisfaction-option" data-rating="5">
+                                    <i class="bi bi-emoji-smile-fill"></i>
+                                    <div>Very Satisfied</div>
+                                </div>
+                                <div class="satisfaction-option" data-rating="4">
+                                    <i class="bi bi-emoji-smile"></i>
+                                    <div>Satisfied</div>
+                                </div>
+                                <div class="satisfaction-option" data-rating="3">
+                                    <i class="bi bi-emoji-neutral"></i>
+                                    <div>Neutral</div>
+                                </div>
+                                <div class="satisfaction-option" data-rating="2">
+                                    <i class="bi bi-emoji-frown"></i>
+                                    <div>Dissatisfied</div>
+                                </div>
+                                <div class="satisfaction-option" data-rating="1">
+                                    <i class="bi bi-emoji-angry"></i>
+                                    <div>Very Dissatisfied</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="satisfactionRating" required>
+                        </div>
+
+                        <!-- Specific Feedback -->
+                        <div class="experience-card">
+                            <h5>Specific Feedback</h5>
+                            <div class="mb-3">
+                                <label class="form-label">What went well?</label>
+                                <textarea class="form-control" id="positivesFeedback" rows="3" placeholder="Share what you liked about your experience"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">What could be improved?</label>
+                                <textarea class="form-control" id="improvementsFeedback" rows="3" placeholder="Share any suggestions for improvement"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Service Quality -->
+                        <div class="experience-card">
+                            <h5>Rate the Following</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Staff Friendliness</label>
+                                        <select class="form-select" id="staffRating" required>
+                                            <option value="">Select rating</option>
+                                            <option value="5">Excellent</option>
+                                            <option value="4">Good</option>
+                                            <option value="3">Average</option>
+                                            <option value="2">Poor</option>
+                                            <option value="1">Very Poor</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Waiting Time</label>
+                                        <select class="form-select" id="waitingTimeRating" required>
+                                            <option value="">Select rating</option>
+                                            <option value="5">Very Short</option>
+                                            <option value="4">Short</option>
+                                            <option value="3">Average</option>
+                                            <option value="2">Long</option>
+                                            <option value="1">Very Long</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Cleanliness</label>
+                                        <select class="form-select" id="cleanlinessRating" required>
+                                            <option value="">Select rating</option>
+                                            <option value="5">Excellent</option>
+                                            <option value="4">Good</option>
+                                            <option value="3">Average</option>
+                                            <option value="2">Poor</option>
+                                            <option value="1">Very Poor</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Value for Money</label>
+                                        <select class="form-select" id="valueRating" required>
+                                            <option value="">Select rating</option>
+                                            <option value="5">Excellent</option>
+                                            <option value="4">Good</option>
+                                            <option value="3">Average</option>
+                                            <option value="2">Poor</option>
+                                            <option value="1">Very Poor</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                    </form>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3 class="mb-4">Recent Reviews</h3>
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <select class="form-select" id="ratingFilter">
+                                <option value="all">All Ratings</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4">4+ Stars</option>
+                                <option value="3">3+ Stars</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="typeFilter">
+                                <option value="all">All Types</option>
+                                <option value="hospital">Hospitals</option>
+                                <option value="clinic">Clinics</option>
+                                <option value="pharmacy">Pharmacies</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <select class="form-select" id="sortFilter">
+                                <option value="recent">Most Recent</option>
+                                <option value="rating-high">Highest Rating</option>
+                                <option value="rating-low">Lowest Rating</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="reviewsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-header">
+                <strong class="me-auto" id="toastTitle">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const toast = new bootstrap.Toast(document.getElementById('toast'));
+        let facilities = [];
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadFacilities();
+            loadReviews();
+            initializeSatisfactionRating();
+        });
+
+        // Load facilities
+        async function loadFacilities() {
+            try {
+                const response = await fetch('/api/facilities/search?lat=12.9716&lng=77.5946');
+                const data = await response.json();
+                if (data.success) {
+                    facilities = data.results;
+                    populateFacilitySelect();
+                }
+            } catch (error) {
+                console.error('Error loading facilities:', error);
+                showToast('Error', 'Failed to load facilities');
+            }
+        }
+
+        // Populate facility select
+        function populateFacilitySelect() {
+            const select = document.getElementById('facilitySelect');
+            facilities.forEach(facility => {
+                const option = document.createElement('option');
+                option.value = facility.id;
+                option.textContent = facility.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Initialize satisfaction rating
+        function initializeSatisfactionRating() {
+            const options = document.querySelectorAll('.satisfaction-option');
+            const ratingInput = document.getElementById('satisfactionRating');
+
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                    ratingInput.value = option.dataset.rating;
+                });
+            });
+        }
+
+        // Handle form submission
+        document.getElementById('feedbackForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const facilityId = document.getElementById('facilitySelect').value;
+            const rating = document.getElementById('satisfactionRating').value;
+            const comment = document.getElementById('positivesFeedback').value;
+
+            if (!facilityId || !rating) {
+                showToast('Error', 'Please select a facility and provide a rating');
+                return;
+            }
+
+            const reviewData = {
+                facilityId: parseInt(facilityId),
+                rating: parseInt(rating),
+                comment: comment,
+                details: {
+                    visitDate: document.getElementById('visitDate').value,
+                    visitPurpose: document.getElementById('visitPurpose').value,
+                    improvementsFeedback: document.getElementById('improvementsFeedback').value,
+                    ratings: {
+                        staff: parseInt(document.getElementById('staffRating').value),
+                        waitingTime: parseInt(document.getElementById('waitingTimeRating').value),
+                        cleanliness: parseInt(document.getElementById('cleanlinessRating').value),
+                        value: parseInt(document.getElementById('valueRating').value)
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Success', 'Thank you for your review!');
+                    document.getElementById('feedbackForm').reset();
+                    document.querySelectorAll('.satisfaction-option').forEach(opt => 
+                        opt.classList.remove('selected')
+                    );
+                    loadReviews();
+                } else {
+                    showToast('Error', data.error || 'Failed to submit review');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error', 'Failed to submit review');
+            }
+        });
+
+        // Load reviews
+        function loadReviews() {
+            const rating = document.getElementById('ratingFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+
+            fetch(`/api/reviews?rating=${rating}&type=${type}&sort=${sort}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayReviews(data.reviews);
+                    } else {
+                        showToast('Error', 'Failed to load reviews');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Error', 'Failed to load reviews');
+                });
+        }
+
+        // Display reviews
+        function displayReviews(reviews) {
+            const reviewsList = document.getElementById('reviewsList');
+            
+            if (reviews.length === 0) {
+                reviewsList.innerHTML = `
+                    <div class="text-center my-5">
+                        <i class="bi bi-chat-square-text text-muted" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">No reviews yet</h4>
+                        <p class="text-muted">Be the first to share your experience!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            reviewsList.innerHTML = reviews.map(review => `
+                <div class="experience-card review-card">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">${review.facilityName}</h5>
+                            <div class="rating-group">
+                                ${Array(5).fill().map((_, i) => 
+                                    `<i class="bi bi-star${i < review.rating ? '-fill' : ''} text-warning"></i>`
+                                ).join('')}
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            ${new Date(review.timestamp).toLocaleDateString()}
+                        </small>
+                    </div>
+                    <p class="mt-3 mb-0">${review.comment || 'No comment provided'}</p>
+                    ${review.positivesFeedback ? `
+                        <div class="mt-3">
+                            <strong>What went well:</strong>
+                            <p class="mb-0">${review.positivesFeedback}</p>
+                        </div>
+                    ` : ''}
+                    ${review.improvementsFeedback ? `
+                        <div class="mt-3">
+                            <strong>Suggestions for improvement:</strong>
+                            <p class="mb-0">${review.improvementsFeedback}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Show toast notification
+        function showToast(title, message) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+            toast.show();
+        }
+
+        // Logout function
+        function logout() {
+            fetch('/api/auth/logout', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error', 'Failed to logout');
+            });
+        }
+
+        // Add event listeners for filters
+        document.getElementById('ratingFilter').addEventListener('change', loadReviews);
+        document.getElementById('typeFilter').addEventListener('change', loadReviews);
+        document.getElementById('sortFilter').addEventListener('change', loadReviews);
+    </script>
+</body>
+</html> 

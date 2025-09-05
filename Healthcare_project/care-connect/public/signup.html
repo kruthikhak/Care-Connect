@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Care Connect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .signup-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 500px;
+            width: 90%;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Doctor Animation Styles */
+        .doctor-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .doctor-icon {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.2);
+            animation: floatDoctor 6s infinite ease-in-out;
+        }
+
+        .doctor-icon:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .doctor-icon:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
+        .doctor-icon:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 2s; }
+        .doctor-icon:nth-child(4) { top: 40%; right: 15%; animation-delay: 3s; }
+        .doctor-icon:nth-child(5) { bottom: 20%; right: 5%; animation-delay: 4s; }
+        .doctor-icon:nth-child(6) { top: 60%; left: 10%; animation-delay: 5s; }
+
+        .pulse {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .pulse:nth-child(7) { top: 15%; left: 8%; animation-delay: 0s; }
+        .pulse:nth-child(8) { top: 25%; right: 12%; animation-delay: 0.5s; }
+        .pulse:nth-child(9) { bottom: 35%; left: 18%; animation-delay: 1s; }
+        .pulse:nth-child(10) { top: 45%; right: 18%; animation-delay: 1.5s; }
+
+        @keyframes floatDoctor {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            box-shadow: none;
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .btn-primary {
+            background: white;
+            color: #4361ee;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-outline-light {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: fadeInLeft 0.5s ease forwards;
+            z-index: 2;
+        }
+
+        .back-button:hover {
+            color: white;
+            text-decoration: none;
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+            text-align: left;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="doctor-animation">
+            <i class="bi bi-heart-pulse doctor-icon"></i>
+            <i class="bi bi-clipboard2-pulse doctor-icon"></i>
+            <i class="bi bi-hospital doctor-icon"></i>
+            <i class="bi bi-activity doctor-icon"></i>
+            <i class="bi bi-heart doctor-icon"></i>
+            <i class="bi bi-plus-circle doctor-icon"></i>
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+            <div class="pulse"></div>
+        </div>
+
+        <a href="/signin.html" class="back-button">
+            <i class="bi bi-arrow-left me-2"></i>Back
+        </a>
+
+        <div class="auth-card">
+            <h2 class="mb-4">Create Account</h2>
+            <p class="mb-4">Join Care Connect to access healthcare services</p>
+
+            <form id="signupForm">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">First Name</label>
+                        <input type="text" class="form-control" placeholder="First name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Last Name</label>
+                        <input type="text" class="form-control" placeholder="Last name" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" placeholder="Create a password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" placeholder="Confirm your password" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-control" placeholder="Your phone number" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" rows="3" placeholder="Your complete address" required></textarea>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="terms" required>
+                    <label class="form-check-label" for="terms">
+                        I agree to the <a href="#" class="text-white">Terms of Service</a> and <a href="#" class="text-white">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Create Account</button>
+                    <button type="button" class="btn btn-outline-light" onclick="window.location.href='/signin.html'">
+                        Already have an account? Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            window.location.href = '/hospitals.html';
+        });
+    </script>
+</body>
+</html> 

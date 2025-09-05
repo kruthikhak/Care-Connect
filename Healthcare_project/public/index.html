@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Connect - Healthcare Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #4361ee 0%, #3a56d4 100%);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .hero-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s;
+        }
+
+        .hero-features {
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease 0.3s;
+        }
+
+        .feature-item {
+            display: inline-flex;
+            align-items: center;
+            margin: 0.5rem 1rem;
+            font-size: 1.1rem;
+        }
+
+        .feature-item i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .cta-button {
+            animation: fadeInUp 1s ease 0.4s;
+        }
+
+        .btn-hero {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            background: white;
+            color: #4361ee;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            background: white;
+            color: #3a56d4;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <h1 class="hero-title">Welcome to Care Connect</h1>
+        <p class="hero-subtitle">Your trusted healthcare companion</p>
+        
+        <div class="hero-features">
+            <div class="feature-item">
+                <i class="bi bi-clipboard2-pulse"></i>
+                <span>Symptom Assessment</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-calendar-check"></i>
+                <span>Easy Appointments</span>
+            </div>
+            <div class="feature-item">
+                <i class="bi bi-file-medical"></i>
+                <span>Health Records</span>
+            </div>
+        </div>
+
+        <div class="cta-button">
+            <a href="/login" class="btn btn-hero">Get Started</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
