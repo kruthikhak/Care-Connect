@@ -2,6 +2,12 @@
 
 A comprehensive healthcare facility finder application that helps users locate and connect with healthcare providers across India.
 
+**Note:**  
+> This project demonstrates a healthcare recommendation system with location-based search, filtering, and recommendation algorithms.  
+> The dataset used is partially synthetic/demo, so some hospital-specialization mappings may not reflect real-world accuracy.
+
+
+
 ## Features
 
 ### 1. User Authentication
@@ -199,4 +205,5 @@ http://localhost:3000
 Please read CONTRIBUTING.md for details on our code of conduct and the process for submitting pull requests.
 
 ## License
+
 This project is licensed under the MIT License - see the LICENSE.md file for details 
